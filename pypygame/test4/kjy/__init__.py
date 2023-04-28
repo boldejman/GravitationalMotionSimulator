@@ -1,0 +1,1 @@
+from .cringe import qwerty

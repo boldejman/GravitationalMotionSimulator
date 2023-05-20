@@ -1,7 +1,5 @@
 import pygame
-import pygame.locals as pl
 import pygame_textinput
-from kjy import qwerty
 
 
 pygame.init()

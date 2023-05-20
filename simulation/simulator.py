@@ -2,8 +2,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-
-
 class Ship:
     def __init__(self):
         self.shipPar = {
@@ -80,7 +78,7 @@ class Simulation:
 
         self.planets = [self.planet1, self.planet2]
         self.gravConst = 1
-        self.accuracy = 0.0001
+        self.accuracy = 0.001
 
     def rightSide(self, x, y, v, u):
         f = 0
@@ -120,12 +118,12 @@ class Simulation:
         return shipCoords
 
 
-sim = Simulation()
-x = sim.rungeKutta()
-x = np.array(x)
-
-plt.plot(x[:,0], x[:,1])
-plt.show()
+# sim = Simulation()
+# x = sim.rungeKutta()
+# x = np.array(x)
+#
+# plt.plot(x[:,0], x[:,1])
+# plt.show()
 
 # a = np.array((3, 4))
 # print(a/(a.dot(a))**0.5)

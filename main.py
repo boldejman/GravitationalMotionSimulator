@@ -9,13 +9,17 @@ class UserInterface(ModeObserver):
         self.screen = pg.display.set_mode((1080, 720))
 
         self.menu = MenuMode()
-        self.simulation = None
+        self.menu.addObserver(self)
+
+        self.mode = None
+
         self.currentMode = 'Setting'
         self.running = True
+        self.clock = pg.time.Clock()
 
-    def simulationMode(self):
+    def simulationModeRequested(self):
         self.currentMode = 'Simulation'
-        self.simulation = SimulationMode()
+        self.mode = SimulationMode()
 
     def quitRequested(self):
         self.running = False
@@ -24,9 +28,14 @@ class UserInterface(ModeObserver):
         while self.running:
             self.menu.update()
             self.menu.processInput()
+            self.menu.render(self.screen)
 
             if self.currentMode == 'Simulation':
-                self.simulation.render()
+                self.mode.render(self.screen)
+
+            pg.display.update()
+            self.clock.tick(60)
+
 
 UI = UserInterface()
 UI.run()

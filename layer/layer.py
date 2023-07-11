@@ -37,3 +37,6 @@ class Layer:
                 spritePoint.y -= (rotatedTile.get_height() - textureTile.get_height()) // 2
                 # Render the rotatedTile
                 surface.blit(rotatedTile, spritePoint)
+
+    def render(self, surface):
+        pass

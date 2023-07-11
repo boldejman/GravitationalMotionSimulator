@@ -1,5 +1,5 @@
 class ModeObserver:
-    def simulationMode(self):
+    def simulationModeRequested(self):
         pass
 
     def quitRequested(self):

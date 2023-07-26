@@ -38,7 +38,7 @@ def rightSide(x, y, v, u, m=1, k=1):
     return [derx, dery, derv, deru]
 
 
-def RungeKutta(x0, y0, v0, u0, t0, t, h=0.00001):
+def RungeKutta(x0, y0, v0, u0, t0, t, h=0.0001):
     # number of iterating process
     n = int((t-t0)/h)
 
@@ -75,7 +75,7 @@ y0 = 0.4
 v0 = 1
 u0 = -0.5
 
-x, y, v, u = RungeKutta(x0, y0, v0, u0, 0, 20)
+x, y, v, u = RungeKutta(x0, y0, v0, u0, 0, 10)
 print(v[1],u[1])
 print(math.atan(u[1000]/v[1000])*180/math.pi)
 
@@ -100,8 +100,8 @@ def main():
         pg.draw.rect(screen, (210, 190, 190), (840, 0, 1080, 720))
         pg.draw.circle(screen, (255, 255, 255), (960, 600), 120)
 
-        pos = (x[i*1000]+500, y[i*1000]+500)
-        angle = math.atan(u[i*1000]/v[i*1000])*180/math.pi
+        pos = (x[i*1000]+500, y[i*100]+500)
+        angle = math.atan(u[i*100]/v[i*100])*180/math.pi
         i += 1
         blitRotate(screen, image, pos, (w / 2, h / 2), angle, zoom)
         pg.display.flip()

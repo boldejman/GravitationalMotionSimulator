@@ -1,2 +1,23 @@
 # GravitationalMotionSimulator
-Simulator of gravitational motion with fixed points 
+
+ Simulator of gravitational motion with fixed planets.
+
+## How to launch:
+#### From Source
+Run the `main.py` file from repository root.
+
+## Dependencies
+If running from source then dependencies can be installed from the `requirements.txt` file with 
+
+`python -m pip install -r requirements.txt`.
+
+## Screenshots
+![3 Planets](figures/screenshot_3_planets.png)
+![2 Planets](figures/screenshot_2_planets.png)
+
+## How to launch simulation:
+Firstly, set the masses of the planets and the ship. The regular values of mass parameters for planets are around 10^5 - 10^6, and for the ship, they range from 1 to 10. Next, arrange your units on the playing window. You can also set the accuracy and time for simulating.
+
+Once you've done that, click the `play simulation` button. The time it takes for the calculations can vary from a few seconds to one minute. After the calculations are complete, your simulation will start. While playing the simulation, you can click the `stop playing` button or the `reset` button.
+
+Please note that during the simulation or when it's stopped, you cannot change or add new units. To do this, you'll need to wait for the simulation to end or click the `reset` button, which will delete all units.

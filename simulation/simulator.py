@@ -1,42 +1,30 @@
-import numpy as np
-import matplotlib.pyplot as plt
-
-from states import Ship, Planet
-from states import StateObserver
+from units import Ship, Planet
 
 
-class Simulation(StateObserver):
+class Simulation:
     def __init__(self):
         self.ship = Ship()
-        # self.ship.shipPar["coord"] = [1, 0.4]
-        # self.ship.shipPar["vel"] = [1, -0.5]
-        # self.ship.shipPar["mass"] = 1
-        #
-        # self.planet1 = Planet()
-        # self.planet1.planPar["coord"] = [0, 0]
-        # self.planet1.planPar["mass"] = 1
-        #
-        # self.planet2 = Planet()
-        # self.planet2.planPar["coord"] = [1, 0]
-        # self.planet2.planPar["mass"] = 1
-
-        self.tmax = 20
-
+        self.tmax = 15
+        # self.cnt = 0
         self.planets = []
         self.gravConst = 1
         self.accuracy = 0.0001
-        self.cnt = 0
 
     def shipSet(self, shipPos, shipMass, shipVel):
         self.ship.shipPar['coord'] = shipPos
         self.ship.shipPar['mass'] = shipMass
         self.ship.shipPar['vel'] = shipVel
-        print(self.ship)
 
     def planetSet(self, planetPos, planetMass):
         self.planets.append(Planet(planetPos, planetMass))
-        print(self.planets)
 
+    def accuracySet(self, accuracy):
+        self.accuracy = accuracy
+
+    def tMaxSet(self, tMax):
+        self.tmax = tMax
+
+    # Calculate right side for differential equation
     def rightSide(self, x, y, v, u):
         f = [0, 0]
         coord = [x, y]
@@ -63,6 +51,7 @@ class Simulation(StateObserver):
 
         return [derx, dery, derv, deru]
 
+    # Numerical Method
     def rungeKutta(self):
         h = self.accuracy
         n = int(self.tmax/h)
@@ -86,23 +75,9 @@ class Simulation(StateObserver):
             u_k += (k1[3] + 2 * k2[3] + 2 * k3[3] + k4[3]) / 6
             shipCoords.append((x_k, y_k))
 
-            self.cnt += 1
-            if self.cnt % 100 == 0:
-                print(x_k, y_k)
-
+            if not -500 < x_k < 1340 or not -500 < y_k < 1220:
+                return shipCoords
         return shipCoords
 
     def getPositions(self):
         return self.rungeKutta()
-
-
-
-# sim = Simulation()
-# c = sim.rungeKutta()
-# c = np.array(c)
-#
-# plt.plot(c[:, 0], c[:, 1])
-# plt.show()
-
-# a = np.array((3, 4))
-# print(a/(a.dot(a))**0.5)

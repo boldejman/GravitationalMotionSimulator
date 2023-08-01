@@ -1,22 +1,17 @@
-from units import Ship, Planet
-
-
 class Simulation:
     def __init__(self):
-        self.ship = Ship()
+        self.ship = None
         self.tmax = 15
         # self.cnt = 0
         self.planets = []
         self.gravConst = 1
         self.accuracy = 0.0001
 
-    def shipSet(self, shipPos, shipMass, shipVel):
-        self.ship.shipPar['coord'] = shipPos
-        self.ship.shipPar['mass'] = shipMass
-        self.ship.shipPar['vel'] = shipVel
+    def shipSet(self, ship):
+        self.ship = ship
 
-    def planetSet(self, planetPos, planetMass):
-        self.planets.append(Planet(planetPos, planetMass))
+    def planetSet(self, planets):
+        self.planets = planets
 
     def accuracySet(self, accuracy):
         self.accuracy = accuracy
@@ -33,19 +28,19 @@ class Simulation:
         n = [0, 0]
 
         for planet in self.planets:
-            r[0] = planet.planPar["coord"][0] - coord[0]
-            r[1] = planet.planPar["coord"][1] - coord[1]
+            r[0] = planet.coord[0] - coord[0]
+            r[1] = planet.coord[1] - coord[1]
 
             rLength = (r[0]**2 + r[1]**2)**0.5
 
             n[0] = r[0]/rLength
             n[1] = r[1]/rLength
 
-            f[0] += self.gravConst * self.ship.shipPar["mass"] * planet.planPar["mass"] * n[0] / (rLength**2)
-            f[1] += self.gravConst * self.ship.shipPar["mass"] * planet.planPar["mass"] * n[1] / (rLength ** 2)
+            f[0] += self.gravConst * self.ship.mass * planet.mass * n[0] / (rLength ** 2)
+            f[1] += self.gravConst * self.ship.mass * planet.mass * n[1] / (rLength ** 2)
 
-        derv = f[0] / self.ship.shipPar["mass"]
-        deru = f[1] / self.ship.shipPar["mass"]
+        derv = f[0] / self.ship.mass
+        deru = f[1] / self.ship.mass
         derx = vel[0]
         dery = vel[1]
 
@@ -56,8 +51,8 @@ class Simulation:
         h = self.accuracy
         n = int(self.tmax/h)
 
-        x_k, y_k = self.ship.shipPar["coord"]
-        v_k, u_k = self.ship.shipPar["vel"]
+        x_k, y_k = self.ship.coord
+        v_k, u_k = self.ship.vel
         shipCoords = []
 
         for i in range(n+1):

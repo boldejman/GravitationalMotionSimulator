@@ -2,6 +2,7 @@ import pygame as pg
 import constants
 from mode import Menu, SimulationManager
 from simulation import Simulation
+from units import Ship, Planet
 
 
 class UserInterface:
@@ -13,35 +14,35 @@ class UserInterface:
         self.mouse = None
         self.events = None
         self.running = True
+        self.cnt = 0
 
-        # every 'planet' is tuple ('coordinates', 'mass')
         self.planets = []
         self.planetDispositionCheck = False  # it needs to dispose the planet
-        self.planetImage = pg.image.load('figures/planet.png')
 
-        # ship is tuple ('coordinates', 'mass', 'velocity')
         self.ship = None
         self.shipDispositionCheck = False
         self.shipVelocityCheck = False
-        self.shipCoord = (0, 0)
-        self.shipImage = pg.image.load('figures/rocket3.png')
         self.velCoef = 5
 
-        self.background = pg.image.load("figures/background_space.png")
+        self.background = pg.image.load('figures/background_space.png')
 
         self.menu = Menu(self)
         self.simulation = Simulation()
         self.simulationManager = SimulationManager(self.simulation, self)
         self.currentMode = 'setting'
 
+        self.currentUnit = None
+
+        self.units = []
+
     def run(self):
         while self.running:
             self.update()
             self.menu.update()
-            self.simulationManager.update()
             self.processInput()
             self.menu.processInput()
             self.screen.blit(self.background, (0, 0))
+            self.simulationManager.update()
             self.simulationManager.render(self.screen)
             self.menu.render(self.screen)
             self.running = self.menu.running
@@ -52,42 +53,85 @@ class UserInterface:
     def update(self):
         self.mouse = pg.mouse.get_pos()
         self.events = pg.event.get()
+        # print(self.currentUnit)
+        # for unit in self.units:
+        #     print(unit.mass)
 
     def processInput(self):
         for event in self.events:
-            if event.type == pg.MOUSEBUTTONUP:
+
+            if event.type == pg.MOUSEBUTTONDOWN:
                 # dispose and save the planet
-                if self.planetDispositionCheck and 0 < self.mouse[0] < constants.PLAYING_SCREEN_X:
-                    self.planets.append((self.mouse, float(self.menu.menuTextInput[0].value)))
+                if self.planetDispositionCheck and 0 < self.mouse[0] < constants.PLAYING_SCREEN_X and \
+                        0 < self.mouse[1] < constants.PLAYING_SCREEN_Y:
+                    self.currentUnit.x, self.currentUnit.y = self.mouse
+                    self.cnt += 1
+                    self.currentUnit.name = self.cnt
+                    self.planets.append(self.currentUnit)
+
+                    self.units.append(self.currentUnit)
                     self.planetDispositionCheck = False
+                    self.currentUnit = None
                     self.menu.notifyingWindow.text = ['']
 
                 # set the velocity of the ship and saving it
-                if self.shipVelocityCheck and 0 < self.mouse[0] < constants.PLAYING_SCREEN_X and \
+                elif self.shipVelocityCheck and 0 < self.mouse[0] < constants.PLAYING_SCREEN_X and \
                         0 < self.mouse[1] < constants.PLAYING_SCREEN_Y:
-                    self.ship = (self.shipCoord, float(self.menu.menuTextInput[1].value),
-                                 (float(self.mouse[0] - self.shipCoord[0]) / self.velCoef,
-                                  float(self.mouse[1] - self.shipCoord[1]) / self.velCoef))
-
+                    self.ship = self.currentUnit
+                    self.ship.vel = (float(self.mouse[0] - self.ship.x) / self.velCoef,
+                                     float(self.mouse[1] - self.ship.y) / self.velCoef)
+                    self.units.append(self.ship)
                     self.shipVelocityCheck = False
+                    self.currentUnit = None
                     self.menu.notifyingWindow.text = ['']
 
                 # dispose the ship
-                if self.shipDispositionCheck and 0 < self.mouse[0] < constants.PLAYING_SCREEN_X:
+                elif self.shipDispositionCheck and 0 < self.mouse[0] < constants.PLAYING_SCREEN_X:
+                    self.currentUnit.x, self.currentUnit.y = self.mouse
                     self.shipDispositionCheck = False
                     self.shipVelocityCheck = True
-                    self.shipCoord = self.mouse
+
                     self.menu.notifyingWindow.text = ['Enter the velocity of', 'the ship.']
+
+                elif event.button == 1:
+                    for unit in self.units:
+                        if self.mouse in unit:
+                            overlapUnits = self.units[self.units.index(unit) + 1:]
+                            if not any(self.mouse in overlapUnit for overlapUnit in overlapUnits):
+                                self.units.remove(unit)
+                                self.units.append(unit)
+                                unit.set_offset(self.mouse)
+                                self.currentUnit = unit
+
+                self.currentMode = 'setting'
+
+            elif event.type == pg.MOUSEBUTTONUP:
+                if event.button == 1:
+                    if self.currentUnit and not self.shipVelocityCheck and self.currentMode != 'simulating' and \
+                            self.currentMode != 'stop':
+                        self.currentUnit.dragging = False
+                        self.currentUnit.dragged = True
+                        # self.currentUnit = None
+                        if any(self.mouse in unit for unit in self.units) or \
+                                self.mouse in self.menu.shipMassInput or self.mouse in self.menu.planetMassInput:
+                            pass
+                        else:
+                            self.currentUnit = None
+
+            elif event.type == pg.MOUSEMOTION and self.currentMode != 'simulating' and self.currentMode != 'stop':
+                if self.currentUnit and not self.shipVelocityCheck and self.currentUnit.dragging:
+                    self.currentUnit.drag(self.mouse)
 
     def checkPlanet(self):
         # checks if is possible to add the planet
         if self.currentMode != 'simulating' and self.currentMode != 'stop':
-            if self.currentMode != 'setting':
-                self.currentMode = 'setting'
+            self.currentMode = 'setting'
 
             if self.menu.planetMassInput.value == '':
                 self.menu.notifyingWindow.text = ['Please, enter', 'the mass of the', 'planet.']
             else:
+                self.currentUnit = Planet()
+                self.currentUnit.mass = float(self.menu.planetMassInput.value)
                 self.menu.notifyingWindow.text = ['Choose the position.']
                 self.planetDispositionCheck = True
                 self.shipDispositionCheck = False
@@ -96,13 +140,18 @@ class UserInterface:
     def checkShip(self):
         # checks if is possible to add the ship
         if self.currentMode != 'simulating' and self.currentMode != 'stop':
-            if self.currentMode != 'setting':
-                self.currentMode = 'setting'
+            self.currentMode = 'setting'
 
             if self.menu.shipMassInput.value == '':
                 self.menu.notifyingWindow.text = ['Please, enter the', 'mass of the', 'ship.']
             else:
+                self.currentUnit = Ship()
                 self.ship = None
+                for unit in self.units:
+                    if isinstance(unit, Ship):
+                        self.units.remove(unit)
+                self.ship = self.currentUnit
+                self.currentUnit.mass = float(self.menu.shipMassInput.value)
                 self.menu.notifyingWindow.text = ['Choose the position.']
                 self.shipDispositionCheck = True
                 self.planetDispositionCheck = False
@@ -110,11 +159,15 @@ class UserInterface:
     def launchSimulator(self):
         # launches the simulation
         if self.simulationCanBeStarted():
-
-            for planet in self.planets:
-                self.simulationManager.simulation.planetSet(planet[0], planet[1])
-
-            self.simulationManager.simulation.shipSet(self.ship[0], self.ship[1], self.ship[2])
+            if any(unit.dragged for unit in self.units):
+                for planet in self.planets:
+                    planet.coord = [planet.x, planet.y]
+                self.simulationManager.simulation.planetSet(self.planets)
+                self.ship.coord = [self.ship.x, self.ship.y]
+                self.simulationManager.simulation.shipSet(self.ship)
+                self.currentMode = 'setting'
+        for unit in self.units:
+            unit.dragged = False
 
             # if the simulation was run, but some parameters were changed, then calculations will be re-calculated.
             if self.simulationManager.simulation.accuracy != float(self.menu.menuTextInput[2].value):
@@ -140,23 +193,33 @@ class UserInterface:
             self.menu.notifyingWindow.text = ['Please, set at least', 'one planet.']
             return False
 
-        if not self.ship:
+        elif not self.ship:
             self.menu.notifyingWindow.text = ['Please, set the ship.']
             return False
 
-        return True
+        elif self.menu.accuracyInput.value == '':
+            self.menu.notifyingWindow.text = ['Please, set the ship.']
+            return False
+
+        elif self.menu.tMax.value == '':
+            self.menu.notifyingWindow.text = ['Please, set the ship.']
+            return False
+
+        else:
+            return True
 
     def reset(self):
         self.currentMode = 'setting'
         self.simulation = Simulation()
         self.simulationManager = SimulationManager(self.simulation, self)
 
-        self.ship = None
+        self.units.clear()
+
+        # self.ship = None
         self.shipDispositionCheck = False
         self.shipVelocityCheck = False
-        self.shipCoord = (0, 0)
-
-        self.planets = []
+        #
+        self.planets.clear()
         self.planetDispositionCheck = False
 
         self.menu.notifyingWindow.text = ''

@@ -1,6 +1,7 @@
 import pygame as pg
 import constants
 from pygame_textinput import TextInputVisualizer
+from units import Ship, Planet
 
 
 class Menu:
@@ -52,6 +53,9 @@ class Menu:
         self.events = None
         self.currentTextInput = -1
 
+        self.planetMassIsChosen = False
+        self.shipMassIsChosen = False
+
     def update(self):
         self.mouse = self.ui.mouse
         for index, textInput in enumerate(self.menuTextInput):
@@ -61,6 +65,22 @@ class Menu:
         for item in self.menuTextInput:
             if not item.isCurrent:
                 item.cursor_visible = False
+            else:
+                item.cursor_visible = True
+
+        if self.ui.currentUnit:
+            # print(self.ui.currentUnit)
+            if isinstance(self.ui.currentUnit, Ship):
+                self.shipMassIsChosen = True
+                self.planetMassIsChosen = False
+                # self.ui.currentUnit.setMass(float(self.shipMassInput.value))
+                # self.shipMassInput.isCurrent = True
+            elif isinstance(self.ui.currentUnit, Planet):
+                self.planetMassIsChosen = True
+                self.shipMassIsChosen = False
+                # self.ui.currentUnit.setMass(float(self.planetMassInput.value))
+                # self.planetMassInput.isCurrent = True
+                # print('aaa')
 
     def processInput(self):
         for event in self.events:
@@ -82,10 +102,12 @@ class Menu:
                 if not somethingWasChosen:
                     for item in self.menuTextInput:
                         item.isCurrent = False
+                        self.shipMassIsChosen = False
+                        self.planetMassIsChosen = False
 
             if event.type == pg.KEYDOWN:
                 for index, item in enumerate(self.menuTextInput):
-                    if self.currentTextInput == index:
+                    if self.currentTextInput == index and item.isCurrent:
                         if event.key == pg.K_0 or event.key == pg.K_1 or \
                                 event.key == pg.K_2 or event.key == pg.K_3 or \
                                 event.key == pg.K_4 or event.key == pg.K_5 or \
@@ -93,29 +115,52 @@ class Menu:
                                 event.key == pg.K_8 or event.key == pg.K_9 or \
                                 event.key == pg.K_PERIOD:
                             if item.digitCounter < 10:
-                                item.cursor_visible = False
                                 item.update(self.events)
                                 item.digitCounter += 1
-                        if event.key == pg.K_BACKSPACE:
+
+                            # if self.ui.currentUnit:
+                            #     if isinstance(self.ui.currentUnit, Ship) and item is self.shipMassInput:
+                            #         self.ui.currentUnit.setMass(float(self.shipMassInput.value))
+                            #     elif isinstance(self.ui.currentUnit, Planet) and item is self.planetMassInput:
+                            #         print(self.planetMassInput.value)
+                            #         self.ui.currentUnit.setMass(float(self.planetMassInput.value))
+
+                        elif event.key == pg.K_BACKSPACE:
                             if item.digitCounter > 0:
                                 item.digitCounter -= 1
-                            item.cursor_visible = False
+                            # item.cursor_visible = False
                             item.update(self.events)
                         elif event.key == pg.K_RIGHT or event.key == pg.K_LEFT:
-                            item.cursor_visible = False
+                            # item.cursor_visible = False
                             item.update(self.events)
+                        else:
+                            pass
+
+                        if self.planetMassIsChosen and item == self.planetMassInput and self.ui.currentUnit:
+                            self.ui.currentUnit.setMass(float(item.value))
+
+                        if self.shipMassIsChosen and item == self.shipMassInput and self.ui.currentUnit:
+                            self.ui.currentUnit.setMass(float(item.value))
+
+                # print(self.planetMassInput.value)
 
     def render(self, screen):
         pg.draw.rect(screen, (113, 121, 126), (constants.MENU_SCREEN_X, 0, 240, constants.MENU_SCREEN_Y))
         surface1 = self.font.render('Semester Project for MFF', True, (0, 0, 0))
-        screen.blit(surface1, (constants.MENU_SCREEN_X + 20, constants.MENU_SCREEN_Y - 40))
-        surface2 = self.font.render('Nail Sultanvekov', True, (0, 0, 0))
-        screen.blit(surface2, (constants.MENU_SCREEN_X + 20, constants.MENU_SCREEN_Y - 20))
+        screen.blit(surface1, (constants.MENU_SCREEN_X + 10, constants.MENU_SCREEN_Y - 40))
+        surface2 = self.font.render('Nail Sultanbekov', True, (0, 0, 0))
+        screen.blit(surface2, (constants.MENU_SCREEN_X + 10, constants.MENU_SCREEN_Y - 20))
 
         for button in self.menuButtons:
             button.render(screen)
 
         self.notifyingWindow.render(screen)
+
+        if self.planetMassIsChosen and isinstance(self.ui.currentUnit, Planet):
+            self.planetMassInput.value = str(self.ui.currentUnit.mass)
+
+        if self.shipMassIsChosen and isinstance(self.ui.currentUnit, Ship):
+            self.shipMassInput.value = str(self.ui.currentUnit.mass)
 
         for textInput in self.menuTextInput:
             textInput.render(screen)
@@ -184,3 +229,5 @@ class TextInputPlate(TextInputVisualizer):
                 screen.blit(self.surface, self.leftUp)
             else:
                 screen.blit(self.textFont.render(self.name, True, (0, 0, 0)), self.leftUp)
+
+

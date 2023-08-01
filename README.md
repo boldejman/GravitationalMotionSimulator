@@ -9,7 +9,9 @@ Run the `main.py` file from repository root.
 ## Dependencies
 If running from source then dependencies can be installed from the `requirements.txt` file with 
 
-`python -m pip install -r requirements.txt`.
+`pip install -U pygame --user` 
+
+`pip install pygame_textinput`.
 
 ## Screenshots
 ![3 Planets](figures/screenshot_3_planets.png)

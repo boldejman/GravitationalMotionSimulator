@@ -30,25 +30,25 @@ class SimulationManager:
         return True
 
     def getShipPos(self):
-        if len(self.positions) > self.playingProgress + 100 and \
+        if len(self.positions) > self.playingProgress + 100 * int(1 / self.simulation.accuracy / 10000)and \
                 (self.ui.currentMode == 'simulating' or self.ui.currentMode == 'stop'):
             # calculates angle of the ship
             angle = -atan2(
-                (self.positions[self.playingProgress + 100][1] - self.positions[self.playingProgress][1]),
-                (self.positions[self.playingProgress + 100][0] - self.positions[self.playingProgress][0])) \
+                (self.positions[self.playingProgress + 100 * int(1 / self.simulation.accuracy / 10000)][1] - self.positions[self.playingProgress][1]),
+                (self.positions[self.playingProgress + 100 * int(1 / self.simulation.accuracy / 10000)][0] - self.positions[self.playingProgress][0])) \
                 * 180 / pi - 45
 
             if self.ui.currentMode == 'simulating':
-                self.playingProgress += 100
+                self.playingProgress += 100 * int(1 / self.simulation.accuracy / 10000)
 
-            return self.positions[self.playingProgress - 100], angle
+            return self.positions[self.playingProgress - 100 * int(1 / self.simulation.accuracy / 10000)], angle
 
         else:
             self.ui.currentMode = 'done'
             self.ui.menu.notifyingWindow.text = ['Simulating done.']  # don know how to avoid this X(
             angle = -atan2(
-                (self.positions[self.playingProgress-100][1] - self.positions[self.playingProgress-200][1]),
-                (self.positions[self.playingProgress-100][0] - self.positions[self.playingProgress-200][0])) \
+                (self.positions[self.playingProgress - 100 * int(1 / self.simulation.accuracy / 10000)][1] - self.positions[self.playingProgress - 200 * int(1 / self.simulation.accuracy / 10000)][1]),
+                (self.positions[self.playingProgress - 100 * int(1 / self.simulation.accuracy / 10000)][0] - self.positions[self.playingProgress - 200 * int(1 / self.simulation.accuracy / 10000)][0])) \
                 * 180 / pi - 45
             self.playingProgress = 0
             return self.positions[-1], angle

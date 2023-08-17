@@ -145,7 +145,7 @@ class Menu:
                 # print(self.planetMassInput.value)
 
     def render(self, screen):
-        pg.draw.rect(screen, (113, 121, 126), (constants.MENU_SCREEN_X, 0, 240, constants.MENU_SCREEN_Y))
+        pg.draw.rect(screen, (50, 50, 50), (constants.MENU_SCREEN_X, 0, 240, constants.MENU_SCREEN_Y))
         surface1 = self.font.render('Semester Project for MFF', True, (0, 0, 0))
         screen.blit(surface1, (constants.MENU_SCREEN_X + 10, constants.MENU_SCREEN_Y - 40))
         surface2 = self.font.render('Nail Sultanbekov', True, (0, 0, 0))
@@ -179,7 +179,7 @@ class Button:
                self.leftUp[1] <= mouse[1] <= self.leftUp[1] + constants.y
 
     def render(self, screen):
-        pg.draw.rect(screen, (190, 190, 190), (self.leftUp[0],
+        pg.draw.rect(screen, (0, 228, 255), (self.leftUp[0],
                                                self.leftUp[1], constants.x, constants.y))
 
         surface = self.font.render(self.title, True, (0, 0, 0))
@@ -194,7 +194,7 @@ class NotifyingWindow:
         self.font = pg.font.SysFont(pg.font.get_fonts()[10], 15)
 
     def render(self, screen):
-        pg.draw.rect(screen, (190, 190, 190), (self.leftUp[0],
+        pg.draw.rect(screen, (168, 245, 253), (self.leftUp[0],
                                                self.leftUp[1], constants.x, constants.y * 3))
         for index, line in enumerate(self.text):
             surface = self.font.render(line, True, (0, 0, 0))
@@ -220,7 +220,7 @@ class TextInputPlate(TextInputVisualizer):
                self.leftUp[1] <= mouse[1] <= self.leftUp[1] + constants.y
 
     def render(self, screen):
-        pg.draw.rect(screen, (190, 190, 190), (self.leftUp[0],
+        pg.draw.rect(screen, (255, 163, 0), (self.leftUp[0],
                                                self.leftUp[1], constants.x, constants.y))
         if self.isCurrent:
             screen.blit(self.surface, self.leftUp)

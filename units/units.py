@@ -74,7 +74,10 @@ class Ship:
         return False
 
     def setMass(self, mass):
-        self.mass = mass
+        if isinstance(mass, float):
+            self.mass = mass
+        else:
+            raise 'POSHEL NAHUJ'
 
     def set_offset(self, mouse):
         self.dragging = True

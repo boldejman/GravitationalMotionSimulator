@@ -102,8 +102,9 @@ class UserInterface:
                                 self.units.append(unit)
                                 unit.set_offset(self.mouse)
                                 self.currentUnit = unit
-
-                self.currentMode = 'setting'
+                          
+                            if self.currentMode != 'simulating' and self.currentMode != 'stop':
+                                self.setSettingMode()
 
             elif event.type == pg.MOUSEBUTTONUP:
                 if event.button == 1:
@@ -125,8 +126,7 @@ class UserInterface:
     def checkPlanet(self):
         # checks if is possible to add the planet
         if self.currentMode != 'simulating' and self.currentMode != 'stop':
-            self.currentMode = 'setting'
-
+            self.setSettingMode()
             if self.menu.planetMassInput.value == '':
                 self.menu.notifyingWindow.text = ['Please, enter', 'the mass of the', 'planet.']
             else:
@@ -140,7 +140,7 @@ class UserInterface:
     def checkShip(self):
         # checks if is possible to add the ship
         if self.currentMode != 'simulating' and self.currentMode != 'stop':
-            self.currentMode = 'setting'
+            self.setSettingMode()
 
             if self.menu.shipMassInput.value == '':
                 self.menu.notifyingWindow.text = ['Please, enter the', 'mass of the', 'ship.']
@@ -208,8 +208,12 @@ class UserInterface:
         else:
             return True
 
-    def reset(self):
+    def setSettingMode(self):
         self.currentMode = 'setting'
+        self.menu.menuButtons[3].title = 'stop playing'
+        
+    def reset(self):
+        self.setSettingMode()
         self.simulation = Simulation()
         self.simulationManager = SimulationManager(self.simulation, self)
 
@@ -218,7 +222,6 @@ class UserInterface:
         # self.ship = None
         self.shipDispositionCheck = False
         self.shipVelocityCheck = False
-        #
         self.planets.clear()
         self.planetDispositionCheck = False
 

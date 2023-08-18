@@ -2,7 +2,7 @@
 Hello world! This is my python semester project for MFF UK. This is the gravitational motion simulator that use numerical methods to calculate the trajectory in gravitation field. 
 
 ## Architecture
-The whole project was separated into three modules: UI, mode and simulation. Each module is tightly connected to each other (unfortunately), but performs its own function.
+The whole project was separated into four modules: UI, mode, simulation and units. Each module is tightly connected to each other (unfortunately), but performs its own function.
 ### UI
 User Interface module contains main functionality logic of the simulator. 
 #### Attrs:
@@ -111,4 +111,60 @@ SimulatorManger is module, that renders units and trace dots on playing window.
 3. update: updates mouse atc.
 4. render: renders all units at setting and simulation/stop modes.
 
+### Simulation
+This is the main simulation module. Moving of the ship is perform by numerical calculations of 2. order ODE for Newton`s gravitation law mx'' = G*m_ship*(SUM(mass_planet)/R_ship_planet^2). Here I`m using the Runge-Kutta Algorithm for this calculations.
+
+#### Simulation attrs:
+1. ship: ship.
+2. tmax: playing time.
+3. planets: list of planets.
+4. gravConst: Gravitaion constant for the formula.
+5. accuracy: accuracy.
+
+#### Simulation methods:
+1. rightSide: calculates for given parameters the right side of ode. here the main ode separated into 4 1. order odes.
+2. rungeKutta: numerical method.
+3. getPositions: getter for positions of the ship. activates Runge-Kutta method.
+
+### Units
+This module contains two types of units: Ship and Planet.
+
+#### Ship attrs:
+1. x, y: coordinates.
+2. coord: pair of coordinates.
+3. mass: mass of the ship.
+4. vel: coordinate pair of velosity vector.
+5. dragging: needs to Drag-n-Drop alg.
+6. offsetX, offsetY: needs to Drag-n-Drop alg.
+7. shipImage: ship image.
+8. size: image size.
+9. dragged: needs to Drag-n-Drop alg.
+
+#### Ship methods:
+1. contains: dunder method.
+2. setMass: setter for ship mass.
+3. setOffset: setter for Drag-n-Drop.
+4. drag: -||-
+5. render: renders ship.
+
+#### Planet attrs:
+1. name: name of the planet.
+2. x, y: coordinates.
+3. coord: pair of coordinates.
+4. mass: mass of the planet.
+5. dragging: same as 5. in Ship attrs.
+6. offsetX, offsetY: -||-
+7. planetImage: planet image.
+8. size: image size.
+9. dragged: -||-
+
+#### Planet methods:
+1. repr: dunder method.
+2. contains: dunder method:
+3. setMass: setter for planet mass.
+4. setOffset, drag: -||-
+5. render: renders planet.
+
+#### Static functions:
+1. blitRotate: needs to rotate ship sprite.
 

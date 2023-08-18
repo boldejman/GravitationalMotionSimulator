@@ -77,7 +77,7 @@ class Ship:
         if isinstance(mass, float):
             self.mass = mass
         else:
-            raise 'POSHEL NAHUJ'
+            raise ValueError
 
     def set_offset(self, mouse):
         self.dragging = True
@@ -119,4 +119,4 @@ def blitRotate(surf, image, pos, originPos, angle, zoom):
     # rotate and blit the image
     surf.blit(rotozoom_image, origin)
 
-    # draw rectangle around the image
+

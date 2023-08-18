@@ -29,9 +29,7 @@ class Simulation:
 
         for planet in self.planets:
             r[0] = planet.coord[0] - coord[0]
-            r[1] = planet.coord[1] - coord[1]
-
-            rLength = (r[0]**2 + r[1]**2)**0.5
+            r[1] = planet.coord[1] - coord[1] 
 
             n[0] = r[0]/rLength
             n[1] = r[1]/rLength
